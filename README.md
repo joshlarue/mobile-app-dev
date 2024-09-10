@@ -1,79 +1,83 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Documenting React Native Environment Setup
 
-# Getting Started
+## System Requirements
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+- CPU: 12th Gen Intel Core i7-12700H x 20 Cores
+- RAM: 64GiB
+- OS Name: Debian GNU/Linux 12 Bookworm
+- Linux Kernel Version: 6.1.0-25-amd64
+- Shell: Fish Shell
 
-## Step 1: Start the Metro Server
+## Environment Setup
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
-
-To start Metro, run the following command from the _root_ of your React Native project:
-
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+1. Install nvm and Node.js by curling the official install script and piping it into bash. Here are the commands provided by the Node.js site:
 
 ```bash
-# using npm
-npm run android
+# installs nvm (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
 
-# OR using Yarn
-yarn android
+# download and install Node.js (you may need to restart the terminal)
+nvm install 20
+
+# verifies the right Node.js version is in the environment
+node -v # should print `v20.17.0`
+
+# verifies the right npm version is in the environment
+npm -v # should print `10.8.2`
 ```
 
-### For iOS
+2. Install OpenJDK with the apt package manager by running
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+sudo apt install openjdk-17-jdk openjdk-17-jdk-headless openjdk-17-jre openjdk-17-jre-headless
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+3. Install Android Studio from the [official website](https://developer.android.com/studio/index.html), unzip the archive, cd into the bin/ directory and run ./studio.sh. You may need to run chmod +x studio.sh and/or run it with superuser privileges. Add the bin/ directory to your path so that you can run studio from anywhere. I chose to rename studio.sh to studio so that I can just run studio instead of studio.sh from the command line. Using the default configuration on startup will work for the React Native environment.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+4. Install the Android SDK version 34 for Android 14.0 UpsideDownCake along with the Intel x86 Atom_64 System Image which are nested under the Android 14 option. Version 35 conflicts with some aspects of the React Native environment, at least for me and my classmates. You can install the SDK by opening Android Studio, clicking on "Configure", and selecting "SDK Manager." While in the SDK installation dialog, navigate to SDK tools and check Android Emulator and Android SDK Platform-Tools. Click "OK" and install. Find the device manager in Studio and create a new generic Android device running Android 14.0 and the Android SDK 34.
 
-## Step 3: Modifying your App
+5. Add the following lines to your .config/fish/config.fish file to set up your environment variables. Ensure that these paths point to where you installed these components, as I may have installed them in a different location from you.
 
-Now that you have successfully run the app, let's modify it.
+```bash
+set --export ANDROID_HOME $HOME/.programs/Android/Sdk
+set --export PATH $PATH:$ANDROID_HOME/emulator
+set --export PATH $PATH:$ANDROID_HOME/platform-tools
+```
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+6. Install Watchman. Clone the [Github repo](https://github.com/facebook/watchman/), and then run the following commands. You must already have Cargo installed. If you don't, follow the instructions on the [rustup website](https://rustup.rs). If the autogen script fails, check the error messages; it is most likely due to you not having a specific package installed. Install the missing package with the apt package manager.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+```bash
+cd watchman
 
-## Congratulations! :tada:
+sudo ./install-system-packages.sh
 
-You've successfully run and modified your React Native App. :partying_face:
+./autogen.sh
+```
 
-### Now what?
+## React Native Installation Instructions
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+1. Run the following command to uninstall previous installations of the React Native CLI if you have previously installed it globally:
 
-# Troubleshooting
+   ```bash
+   npm uninstall -g react-native-cli @react-native-community/cli
+   ```
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+2. Use the React Native Community CLI to generate a new project by running the following command in your desired directory:
 
-# Learn More
+```bash
+npx @react-native-community/cli@latest init <your-project-name>
+```
 
-To learn more about React Native, take a look at the following resources:
+3. Run the following command to check that your environment is set up. If Android Studio isn't running, you don't have a device emulator set up, or your environment is set up incorrectly, it will tell you and assist you in fixing it.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+```bash
+npx react-native doctor
+```
+
+4. To run the build tool for React Native and run your application on an android emulator, run
+
+```bash
+npx react-native start
+```
+
+in your project directory and type a for android. If you just have one Android emulator, it should automatically boot up and open for you. Congratulations, you are running a React Native app!
